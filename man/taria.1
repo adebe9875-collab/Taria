@@ -1,0 +1,76 @@
+.TH TARIA 1 "November 2026" "Taria 0.3.0" "User Commands"
+.SH NAME
+taria \- terminal-native Linux package manager
+.SH SYNOPSIS
+.B taria
+.I command
+.RI [ arguments ]
+.SH DESCRIPTION
+Taria provides a single command interface to installed native package managers and GitHub discovery. It delegates system package operations to APT/DPKG, Snap, or Pacman. It is a CLI tool and does not provide a GTK window.
+.SH COMMANDS
+.TP
+.B search, s QUERY
+Search available local package sources and GitHub repositories.
+.TP
+.B install, i PACKAGE
+Install a package. Administrator privileges are required.
+.TP
+.B remove, r PACKAGE
+Remove a package. Use --purge for APT purge behavior.
+.TP
+.B info PACKAGE
+Display package metadata.
+.TP
+.B list, ls
+List installed packages.
+.TP
+.B update, u
+Refresh package metadata. On Arch, perform a safe full sync and upgrade.
+.TP
+.B upgrade, up
+Upgrade installed packages. Use --full for APT full-upgrade behavior.
+.TP
+.B doctor
+Check supported package managers and the latest Taria GitHub release.
+.TP
+.B report MESSAGE
+Search this project's public issue tracker for related messages. Local logs are not uploaded.
+.TP
+.B self-update
+Check for or apply a checksum-verified Taria GitHub release. Applying an update requires sudo.
+.SH OPTIONS
+.TP
+.B --source apt|snap|pacman|github|all
+Select package source.
+.TP
+.B --purge
+Use APT purge behavior when removing a package.
+.TP
+.B --full
+Use the distribution's full-upgrade operation.
+.TP
+.B --check
+Check for a Taria update without changing the installed executable.
+.SH EXAMPLES
+.nf
+taria search firefox
+sudo taria install firefox
+sudo taria remove firefox
+sudo taria update
+sudo taria upgrade
+taria doctor
+sudo taria self-update
+.fi
+.SH SECURITY
+Taria requires explicit sudo for system modifications. It does not silently elevate privileges and does not execute arbitrary GitHub repository source code. Self-updates require a matching SHA-256 checksum asset.
+.SH FILES
+.TP
+.I ~/.local/state/taria/errors.log
+Local error log.
+.TP
+.I /usr/local/bin/taria
+Installed executable.
+.SH AUTHOR
+Taria contributors.
+.SH LICENSE
+MIT License.
