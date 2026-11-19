@@ -52,10 +52,10 @@ pub fn search_repositories(query: &str) -> Result<usize> {
     println!("GitHub repositories:");
     for repo in &response.items {
         println!("  {}  ★ {}", repo.full_name, repo.stargazers_count);
-        if let Some(description) = &repo.description {
-            if !description.is_empty() {
-                println!("    {description}");
-            }
+        if let Some(description) = &repo.description
+            && !description.is_empty()
+        {
+            println!("    {description}");
         }
         println!("    {}", repo.html_url);
     }
