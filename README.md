@@ -1,4 +1,4 @@
-# Taria
+#<img src="assets/taria-icon.png" width="180">
 
 **Taria** is an open-source Linux package manager project written in Rust. The first target is Ubuntu, with a GTK 4 desktop interface and an APT/DPKG backend. A small JSON catalog is included and can be mirrored from the project's GitHub repository.
 
