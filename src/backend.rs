@@ -226,32 +226,33 @@ pub fn choose_install_manager(package: &str) -> Result<Manager> {
 }
 
 pub fn detect_installed_manager(package: &str) -> Option<Manager> {
-    if available(Manager::Apt) {
-        if let Ok(out) = output("dpkg-query", &["-W", "-f=${db:Status-Abbrev}", package]) {
-            if out.status.success()
-                && String::from_utf8_lossy(&out.stdout)
-                    .trim_start()
-                    .starts_with("ii")
-            {
-                return Some(Manager::Apt);
-            }
-        }
+    if available(Manager::Apt)
+        && output("dpkg-query", &["-W", "-f=${db:Status-Abbrev}", package])
+            .map(|out| {
+                out.status.success()
+                    && String::from_utf8_lossy(&out.stdout)
+                        .trim_start()
+                        .starts_with("ii")
+            })
+            .unwrap_or(false)
+    {
+        return Some(Manager::Apt);
     }
 
-    if available(Manager::Snap) {
-        if let Ok(out) = output("snap", &["list", package]) {
-            if out.status.success() {
-                return Some(Manager::Snap);
-            }
-        }
+    if available(Manager::Snap)
+        && output("snap", &["list", package])
+            .map(|out| out.status.success())
+            .unwrap_or(false)
+    {
+        return Some(Manager::Snap);
     }
 
-    if available(Manager::Pacman) {
-        if let Ok(out) = output("pacman", &["-Q", package]) {
-            if out.status.success() {
-                return Some(Manager::Pacman);
-            }
-        }
+    if available(Manager::Pacman)
+        && output("pacman", &["-Q", package])
+            .map(|out| out.status.success())
+            .unwrap_or(false)
+    {
+        return Some(Manager::Pacman);
     }
     None
 }
