@@ -3,7 +3,7 @@ mod github;
 mod logging;
 mod updater;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
 use std::process::ExitCode;
 
@@ -84,9 +84,7 @@ enum Commands {
     /// Diagnose package managers and check Taria's GitHub release
     Doctor,
     /// Search the Taria GitHub issue tracker for a related report
-    Report {
-        message: String,
-    },
+    Report { message: String },
     /// Check for or install a verified Taria update from GitHub Releases
     #[command(name = "self-update", visible_alias = "selfupdate")]
     SelfUpdate {
@@ -126,7 +124,10 @@ fn main() -> ExitCode {
 fn run() -> Result<()> {
     let cli = Cli::parse();
     let Some(command) = cli.command else {
-        println!("Taria {} — terminal package manager", env!("CARGO_PKG_VERSION"));
+        println!(
+            "Taria {} — terminal package manager",
+            env!("CARGO_PKG_VERSION")
+        );
         println!("Try 'taria help' or 'taria search firefox'.");
         return Ok(());
     };
@@ -134,7 +135,11 @@ fn run() -> Result<()> {
     match command {
         Commands::Search { query, source } => search(&query, source),
         Commands::Install { package, source } => install(&package, source),
-        Commands::Remove { package, source, purge } => remove(&package, source, purge),
+        Commands::Remove {
+            package,
+            source,
+            purge,
+        } => remove(&package, source, purge),
         Commands::Info { package, source } => backend::show_info(source, &package),
         Commands::List { source } => backend::list_installed(source),
         Commands::Update { source } => backend::refresh(source),
@@ -155,16 +160,38 @@ fn search(query: &str, source: Source) -> Result<()> {
     let strict = !matches!(source, Source::All);
 
     if matches!(source, Source::All | Source::Apt) && backend::available(backend::Manager::Apt) {
-        collect_search(&mut found, "APT", backend::search(backend::Manager::Apt, query), strict)?;
+        collect_search(
+            &mut found,
+            "APT",
+            backend::search(backend::Manager::Apt, query),
+            strict,
+        )?;
     }
     if matches!(source, Source::All | Source::Snap) && backend::available(backend::Manager::Snap) {
-        collect_search(&mut found, "Snap", backend::search(backend::Manager::Snap, query), strict)?;
+        collect_search(
+            &mut found,
+            "Snap",
+            backend::search(backend::Manager::Snap, query),
+            strict,
+        )?;
     }
-    if matches!(source, Source::All | Source::Pacman) && backend::available(backend::Manager::Pacman) {
-        collect_search(&mut found, "Pacman", backend::search(backend::Manager::Pacman, query), strict)?;
+    if matches!(source, Source::All | Source::Pacman)
+        && backend::available(backend::Manager::Pacman)
+    {
+        collect_search(
+            &mut found,
+            "Pacman",
+            backend::search(backend::Manager::Pacman, query),
+            strict,
+        )?;
     }
     if matches!(source, Source::All | Source::Github) {
-        collect_search(&mut found, "GitHub", github::search_repositories(query), strict)?;
+        collect_search(
+            &mut found,
+            "GitHub",
+            github::search_repositories(query),
+            strict,
+        )?;
     }
 
     if found == 0 {
@@ -210,8 +237,9 @@ fn remove(package: &str, source: Option<Source>, purge: bool) -> Result<()> {
         Some(Source::Snap) => backend::Manager::Snap,
         Some(Source::Pacman) => backend::Manager::Pacman,
         Some(Source::Github) => bail!("GitHub source is not a system package manager."),
-        Some(Source::All) | None => backend::detect_installed_manager(package)
-            .context("package is not installed by a supported manager; use --source to select one")?,
+        Some(Source::All) | None => backend::detect_installed_manager(package).context(
+            "package is not installed by a supported manager; use --source to select one",
+        )?,
     };
     backend::remove(manager, package, purge)
 }

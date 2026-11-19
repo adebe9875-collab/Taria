@@ -84,6 +84,8 @@ pub fn search_issues(repository: &str, message: &str) -> Result<()> {
             println!("  {}\n    {}", issue.title, issue.html_url);
         }
     }
-    println!("Taria does not upload local logs automatically. Review them before sharing any report.");
+    println!(
+        "Taria does not upload local logs automatically. Review them before sharing any report."
+    );
     Ok(())
 }

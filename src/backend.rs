@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use std::process::{Command, Output};
 
 use crate::Source;
@@ -89,7 +89,10 @@ pub fn search(manager: Manager, query: &str) -> Result<usize> {
     };
 
     println!("{} results:", manager.label());
-    let count = result.lines().filter(|line| !line.trim().is_empty()).count();
+    let count = result
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .count();
     if result.trim().is_empty() {
         println!("  No results.");
         return Ok(0);
@@ -157,7 +160,10 @@ pub fn list_installed(source: Source) -> Result<()> {
     if matches!(source, Source::All | Source::Apt) && available(Manager::Apt) {
         let out = output(
             "dpkg-query",
-            &["-W", "-f=${binary:Package}\t${Version}\t${db:Status-Abbrev}\n"],
+            &[
+                "-W",
+                "-f=${binary:Package}\t${Version}\t${db:Status-Abbrev}\n",
+            ],
         )?;
         ensure_success("dpkg-query", &out)?;
         println!("Installed APT/DPKG packages:");
@@ -221,10 +227,7 @@ pub fn choose_install_manager(package: &str) -> Result<Manager> {
 
 pub fn detect_installed_manager(package: &str) -> Option<Manager> {
     if available(Manager::Apt) {
-        if let Ok(out) = output(
-            "dpkg-query",
-            &["-W", "-f=${db:Status-Abbrev}", package],
-        ) {
+        if let Ok(out) = output("dpkg-query", &["-W", "-f=${db:Status-Abbrev}", package]) {
             if out.status.success()
                 && String::from_utf8_lossy(&out.stdout)
                     .trim_start()
@@ -258,10 +261,9 @@ fn apt_has_candidate(package: &str) -> bool {
         .ok()
         .filter(|out| out.status.success())
         .map(|out| {
-            String::from_utf8_lossy(&out.stdout).lines().any(|line| {
-                line.trim_start().starts_with("Candidate:")
-                    && !line.contains("(none)")
-            })
+            String::from_utf8_lossy(&out.stdout)
+                .lines()
+                .any(|line| line.trim_start().starts_with("Candidate:") && !line.contains("(none)"))
         })
         .unwrap_or(false)
 }
@@ -315,11 +317,7 @@ pub fn remove(manager: Manager, package: &str, purge: bool) -> Result<()> {
         }
         Manager::Pacman => run_privileged(
             "pacman",
-            &[
-                "-Rns".into(),
-                "--noconfirm".into(),
-                package.into(),
-            ],
+            &["-Rns".into(), "--noconfirm".into(), package.into()],
         ),
     }
 }
@@ -336,15 +334,14 @@ pub fn refresh(source: Source) -> Result<()> {
     // On Arch, a sync-only update can leave the system in a partial-upgrade state.
     // Therefore Taria's update command uses the safe full sync-and-upgrade operation.
     if matches!(source, Source::All | Source::Pacman) && available(Manager::Pacman) {
-        run_privileged(
-            "pacman",
-            &["-Syu".into(), "--noconfirm".into()],
-        )?;
+        run_privileged("pacman", &["-Syu".into(), "--noconfirm".into()])?;
         ran = true;
     }
 
     if matches!(source, Source::All | Source::Snap) && available(Manager::Snap) {
-        println!("Snap refreshes automatically; use 'taria upgrade --source snap' to request an immediate refresh.");
+        println!(
+            "Snap refreshes automatically; use 'taria upgrade --source snap' to request an immediate refresh."
+        );
         ran = true;
     }
 
@@ -370,10 +367,7 @@ pub fn upgrade(source: Source, full: bool) -> Result<()> {
     }
 
     if matches!(source, Source::All | Source::Pacman) && available(Manager::Pacman) {
-        run_privileged(
-            "pacman",
-            &["-Syu".into(), "--noconfirm".into()],
-        )?;
+        run_privileged("pacman", &["-Syu".into(), "--noconfirm".into()])?;
         ran = true;
     }
 

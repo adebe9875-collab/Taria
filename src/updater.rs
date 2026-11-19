@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use reqwest::blocking::Client;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -118,7 +118,9 @@ pub fn self_update(repository: &str, check_only: bool) -> Result<()> {
         release.tag_name
     );
     if !binary_url.starts_with(&expected_prefix) || !checksum_url.starts_with(&expected_prefix) {
-        bail!("release assets point outside the official Taria GitHub release; refusing the update");
+        bail!(
+            "release assets point outside the official Taria GitHub release; refusing the update"
+        );
     }
 
     let client = http()?;
@@ -144,7 +146,11 @@ pub fn self_update(repository: &str, check_only: bool) -> Result<()> {
         .next()
         .context("checksum file is empty")?
         .to_ascii_lowercase();
-    if expected.len() != 64 || !expected.chars().all(|character| character.is_ascii_hexdigit()) {
+    if expected.len() != 64
+        || !expected
+            .chars()
+            .all(|character| character.is_ascii_hexdigit())
+    {
         bail!("release SHA-256 file is malformed");
     }
 
@@ -153,7 +159,8 @@ pub fn self_update(repository: &str, check_only: bool) -> Result<()> {
         bail!("download checksum mismatch; the current Taria binary was not changed");
     }
 
-    let current_exe = std::env::current_exe().context("could not locate the running Taria executable")?;
+    let current_exe =
+        std::env::current_exe().context("could not locate the running Taria executable")?;
     let parent = current_exe
         .parent()
         .context("Taria executable has no parent directory")?;
@@ -195,7 +202,7 @@ fn validate_linux_binary(binary: &[u8]) -> Result<()> {
     }
     let machine = u16::from_le_bytes([binary[18], binary[19]]);
     let expected_machine = match std::env::consts::ARCH {
-        "x86_64" => 62,  // EM_X86_64
+        "x86_64" => 62,   // EM_X86_64
         "aarch64" => 183, // EM_AARCH64
         other => bail!("unsupported self-update architecture: {other}"),
     };
@@ -212,7 +219,9 @@ fn ensure_root() -> Result<()> {
     let root = false;
 
     if !root {
-        bail!("updating /usr/local/bin/taria needs administrator permissions; run 'sudo taria self-update'");
+        bail!(
+            "updating /usr/local/bin/taria needs administrator permissions; run 'sudo taria self-update'"
+        );
     }
     Ok(())
 }

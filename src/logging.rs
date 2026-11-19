@@ -10,7 +10,10 @@ pub fn log_path() -> PathBuf {
     let home = std::env::var_os("HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("."));
-    home.join(".local").join("state").join("taria").join("errors.log")
+    home.join(".local")
+        .join("state")
+        .join("taria")
+        .join("errors.log")
 }
 
 pub fn record_error(message: &str) {
