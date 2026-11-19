@@ -1,0 +1,36 @@
+Taria command reference
+
+Open graphical interface:
+  taria
+
+Search:
+  taria search firefox
+  taria s firefox
+
+Package details:
+  taria info firefox
+
+Install:
+  sudo taria install firefox
+  sudo taria i firefox
+
+Remove:
+  sudo taria remove firefox
+  sudo taria r firefox
+
+Refresh package lists:
+  sudo taria update
+  sudo taria u
+
+Upgrade packages:
+  sudo taria upgrade
+
+List installed packages:
+  taria list
+
+System check:
+  taria doctor
+
+Version and help:
+  taria version
+  taria --help
