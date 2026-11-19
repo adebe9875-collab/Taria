@@ -18,17 +18,17 @@ pub fn log_path() -> PathBuf {
 
 pub fn record_error(message: &str) {
     let path = log_path();
-    if let Some(parent) = path.parent() {
-        if fs::create_dir_all(parent).is_err() {
-            return;
-        }
+    if let Some(parent) = path.parent()
+        && fs::create_dir_all(parent).is_err()
+    {
+        return;
     }
     if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|duration| duration.as_secs())
             .unwrap_or(0);
-        let safe_message = message.replace('\n', " ").replace('\r', " ");
+        let safe_message = message.replace(['\n', '\r'], " ");
         let _ = writeln!(
             file,
             "[{now}] Taria {}: {safe_message}",
