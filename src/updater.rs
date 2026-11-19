@@ -125,10 +125,10 @@ pub fn self_update(repository: &str, check_only: bool) -> Result<()> {
 
     let client = http()?;
     let binary_response = client.get(binary_url).send()?.error_for_status()?;
-    if let Some(length) = binary_response.content_length() {
-        if length > MAX_BINARY_BYTES {
-            bail!("release binary is larger than the 64 MiB safety limit");
-        }
+    if let Some(length) = binary_response.content_length()
+        && length > MAX_BINARY_BYTES
+    {
+        bail!("release binary is larger than the 64 MiB safety limit");
     }
     let binary = binary_response.bytes()?;
     if binary.is_empty() || binary.len() as u64 > MAX_BINARY_BYTES {
