@@ -123,3 +123,4 @@ Taria/
 ## Status
 
 This is the CLI-focused 0.3.0 development release. The native package-manager adapters, GitHub discovery, diagnostics, local error logging and checksum-verified self-update are implemented. It still requires an end-to-end build and tests on Ubuntu 26.10 and Arch. Curated GitHub app installation, signed updates and broader distribution packaging remain roadmap items.
+****
